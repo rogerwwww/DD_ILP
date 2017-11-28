@@ -54,7 +54,7 @@ DD_ILP::external_solver_interface<SOLVER>* build_triangle_gm()
 }
 
 template<typename SOLVER>
-bool test_triangle_gm(DD_ILP::external_solver_interface<SOLVER>* s)
+void test_triangle_gm(DD_ILP::external_solver_interface<SOLVER>* s)
 {
 
   s->solve();

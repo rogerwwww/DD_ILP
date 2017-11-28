@@ -11,3 +11,8 @@ This project was originally developed for the [LP_MP](https://github.com/pawelsw
 Current backends are
 * Lingeling sat solver.
 * export to text file (no optimization)
+
+## Installation
+Type `git clone https://github.com/pawelswoboda/DD_ILP.git` and `cd DD_ILP`. 
+To initialize dependencies, type `git submodule update --init`.
+Then configurate with `cmake .` and build with `make`.

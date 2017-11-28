@@ -21,8 +21,8 @@ before_install:
 script:
   - cmake .
   - make
-  - ./binary_triangle_gm_sat
-  - ./binary_triangle_gm_problem_export
+  - ./test/binary_triangle_gm_sat
+  - ./test/binary_triangle_gm_problem_export
 
 notifications:
    email: false
