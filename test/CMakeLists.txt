@@ -1,0 +1,5 @@
+add_executable(binary_triangle_gm_sat binary_triangle_gm_sat.cpp)
+target_link_libraries(binary_triangle_gm_sat lingeling)
+
+add_executable(binary_triangle_gm_problem_export binary_triangle_gm_problem_export.cpp)
+target_link_libraries(binary_triangle_gm_problem_export lingeling)
