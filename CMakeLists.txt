@@ -14,7 +14,7 @@ list(APPEND DEPENDENCIES lingeling_project)
 ExternalProject_ADD(lingeling_project
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/lingeling"
   CONFIGURE_COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/external/lingeling/configure"
-  BUILD_COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/external/lingeling/make"
+  BUILD_COMMAND "make"
   BUILD_IN_SOURCE 1
   INSTALL_COMMAND ""
   )
