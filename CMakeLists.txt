@@ -23,5 +23,6 @@ add_library(lingeling STATIC IMPORTED GLOBAL)
 set_target_properties(lingeling PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/external/lingeling/liblgl.a")
 set_target_properties(lingeling PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/external/lingeling/")
 
-include_directories(.)
+add_library(DD_ILP INTERFACE)
+target_include_directories(DD_ILP INTERFACE . include )
 add_subdirectory(test) 

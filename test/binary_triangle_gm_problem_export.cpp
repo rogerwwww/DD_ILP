@@ -1,5 +1,6 @@
 #include "binary_triangle_gm.hxx"
-#include "DD_ILP.hxx"
+#include "include/external_solver_interface.hxx"
+#include "include/problem_export.hxx"
 
 using namespace DD_ILP;
 

@@ -2,7 +2,7 @@
 #define DD_ILP_TEST_BINARY_TRIANGLE_GM_HXX
 
 #include "test.h"
-#include "DD_ILP.hxx"
+#include "include/external_solver_interface.hxx"
 
 template<typename SOLVER, typename ITERATOR>
 bool one_hot_variable(SOLVER& s, ITERATOR begin, ITERATOR end)
