@@ -44,9 +44,17 @@ public:
 };
 */
 
+struct variable_counters {
+  std::size_t variables_counter;
+  std::size_t vectors_counter;
+  std::size_t matrices_counter;
+  std::size_t tensors_counter;
+};
+
 template<typename BASE_SOLVER>
 class external_solver_interface : public BASE_SOLVER {
 public:
+
   // solver must make available the following datatypes:
   // (i) variable
   // (ii) vector
@@ -158,7 +166,7 @@ public:
   void add_objective(variable x, const T val)
   {
     static_assert(std::is_arithmetic<T>::value,"objective value for optimization problem must be a number");
-    static_cast<BASE_SOLVER>(this)->add_objective(x, val);
+    static_cast<BASE_SOLVER*>(this)->add_objective(x, val);
   }
 
   template<typename T>
@@ -174,7 +182,7 @@ public:
     auto vec_it = vec.begin();
     auto val_it = vals.begin();
     assert(vec.size() == vals.size());
-    for(; vec_it!=val_it; ++vec_it, ++val_it) {
+    for(; val_it!=vals.end(); ++vec_it, ++val_it) {
       add_objective(*vec_it, *val_it);
     }
   }
@@ -274,33 +282,38 @@ public:
     return static_cast<BASE_SOLVER*>(this)->max(var_begin, var_end); 
   }
 
-  void reset()
-  {
-    variables_counter = 0;
-    vectors_counter = 0;
-    matrices_counter = 0;
-    tensors_counter = 0;
-  }
   bool solve() 
   { 
-    reset();
     return static_cast<BASE_SOLVER*>(this)->solve(); 
   }
   bool solution(variable i) { return static_cast<BASE_SOLVER*>(this)->solution(i); }
 
-private:
+  variable_counters get_variable_counters() const
+  {
+    return variable_counters({variables_.size(), vectors_.size(), matrices_.size(), tensors_.size()});
+  }
+
+  void set_variable_counters(const variable_counters& c)
+  { 
+    variables_counter = c.variables_counter;
+    vectors_counter = c.vectors_counter;
+    matrices_counter = c.matrices_counter;
+    tensors_counter = c.tensors_counter;
+  }
+
+//private:
   // each factor adds new variables. We store them here so they can be again recovered later for reconstructing primal solution or initializing optimization costs;
   std::vector<variable> variables_;
-  std::size_t variables_counter;
+  std::size_t variables_counter = 0;
   
   std::vector<vector> vectors_;
-  std::size_t vectors_counter;
+  std::size_t vectors_counter = 0;
   
   std::vector<matrix> matrices_;
-  std::size_t matrices_counter;
+  std::size_t matrices_counter = 0;
 
   std::vector<tensor> tensors_;
-  std::size_t tensors_counter;
+  std::size_t tensors_counter = 0;
 
   // Models can be reduced by exclusing variables which carry too high cost. Reduction is done automatically for the implemented constraint functions.
   struct assumption { variable var; unsigned char value; };

@@ -294,6 +294,9 @@ struct tensor {
     return one_active;
   } 
 
+  bool solve() const
+  { return false; }
+
   void write_to_file(const std::string& filename) const
   {
     std::ofstream f(filename);
