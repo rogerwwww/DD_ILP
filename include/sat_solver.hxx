@@ -331,7 +331,11 @@ std::size_t size() const
   template<typename T>
   void add_objective(sat_literal l, const T val)
   {
-    assert(false);
+    assert(l >= 1);
+    if(objective_.size() <= l-1) {
+      objective_.resize(l, 0.0);
+    }
+    objective_[l-1] = val;
   }
 
    template<typename... T_REST>
@@ -642,6 +646,7 @@ std::size_t size() const
 protected:
   
   LGL* const sat_;
+  std::vector<double> objective_;
 };
 
 /*
