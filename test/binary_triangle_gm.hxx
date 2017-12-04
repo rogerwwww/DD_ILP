@@ -2,7 +2,7 @@
 #define DD_ILP_TEST_BINARY_TRIANGLE_GM_HXX
 
 #include "test.h"
-#include "include/external_solver_interface.hxx"
+#include "external_solver_interface.hxx"
 
 template<typename SOLVER, typename ITERATOR>
 bool one_hot_variable(SOLVER& s, ITERATOR begin, ITERATOR end)
@@ -20,35 +20,40 @@ DD_ILP::external_solver_interface<SOLVER>* build_triangle_gm()
 {
   DD_ILP::external_solver_interface<SOLVER>* s = new DD_ILP::external_solver_interface<SOLVER>();
 
-  {
-    // construct problem
-    auto unary1 = s->add_vector(2);
-    auto unary2 = s->add_vector(2);
-    auto unary3 = s->add_vector(2);
+  // construct problem
+  auto unary1 = s->add_vector(2);
+  auto unary2 = s->add_vector(2);
+  auto unary3 = s->add_vector(2);
 
-    s->add_simplex_constraint(unary1.begin(), unary1.end());
-    s->add_simplex_constraint(unary2.begin(), unary2.end());
-    s->add_simplex_constraint(unary3.begin(), unary3.end());
+  s->add_objective(unary1[0], 1.0);
+  s->add_objective(unary1[1], 2.0);
+  s->add_objective(unary2[0], 10.0);
+  s->add_objective(unary2[1], 20.0);
+  s->add_objective(unary3[0], 100.0);
+  s->add_objective(unary3[1], 200.0);
 
-    auto pairwise12 = s->add_matrix(2,2);
-    auto pairwise13 = s->add_matrix(2,2);
-    auto pairwise23 = s->add_matrix(2,2);
+  s->add_simplex_constraint(unary1.begin(), unary1.end());
+  s->add_simplex_constraint(unary2.begin(), unary2.end());
+  s->add_simplex_constraint(unary3.begin(), unary3.end());
 
-    s->make_equal(unary1[0], s->max(pairwise12(0,0), pairwise12(0,1)));
-    s->make_equal(unary1[1], s->max(pairwise12(1,0), pairwise12(1,1)));
-    s->make_equal(unary2[0], s->max(pairwise12(0,0), pairwise12(1,0)));
-    s->make_equal(unary2[1], s->max(pairwise12(0,1), pairwise12(1,1)));
+  auto pairwise12 = s->add_matrix(2,2);
+  auto pairwise13 = s->add_matrix(2,2);
+  auto pairwise23 = s->add_matrix(2,2);
 
-    s->make_equal(unary1[0], s->max(pairwise13(0,0), pairwise13(0,1)));
-    s->make_equal(unary1[1], s->max(pairwise13(1,0), pairwise13(1,1)));
-    s->make_equal(unary3[0], s->max(pairwise13(0,0), pairwise13(1,0)));
-    s->make_equal(unary3[1], s->max(pairwise13(0,1), pairwise13(1,1)));
+  s->make_equal(unary1[0], s->max(pairwise12(0,0), pairwise12(0,1)));
+  s->make_equal(unary1[1], s->max(pairwise12(1,0), pairwise12(1,1)));
+  s->make_equal(unary2[0], s->max(pairwise12(0,0), pairwise12(1,0)));
+  s->make_equal(unary2[1], s->max(pairwise12(0,1), pairwise12(1,1)));
 
-    s->make_equal(unary2[0], s->max(pairwise23(0,0), pairwise23(0,1)));
-    s->make_equal(unary2[1], s->max(pairwise23(1,0), pairwise23(1,1)));
-    s->make_equal(unary3[0], s->max(pairwise23(0,0), pairwise23(1,0)));
-    s->make_equal(unary3[1], s->max(pairwise23(0,1), pairwise23(1,1)));
-  }
+  s->make_equal(unary1[0], s->max(pairwise13(0,0), pairwise13(0,1)));
+  s->make_equal(unary1[1], s->max(pairwise13(1,0), pairwise13(1,1)));
+  s->make_equal(unary3[0], s->max(pairwise13(0,0), pairwise13(1,0)));
+  s->make_equal(unary3[1], s->max(pairwise13(0,1), pairwise13(1,1)));
+
+  s->make_equal(unary2[0], s->max(pairwise23(0,0), pairwise23(0,1)));
+  s->make_equal(unary2[1], s->max(pairwise23(1,0), pairwise23(1,1)));
+  s->make_equal(unary3[0], s->max(pairwise23(0,0), pairwise23(1,0)));
+  s->make_equal(unary3[1], s->max(pairwise23(0,1), pairwise23(1,1)));
 
   return s;
 }

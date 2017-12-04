@@ -3,3 +3,8 @@ target_link_libraries(binary_triangle_gm_sat DD_ILP lingeling)
 
 add_executable(binary_triangle_gm_problem_export binary_triangle_gm_problem_export.cpp)
 target_link_libraries(binary_triangle_gm_problem_export DD_ILP)
+
+if(WITH_GUROBI)
+  add_executable(binary_triangle_gm_gurobi binary_triangle_gm_gurobi.cpp)
+  target_link_libraries(binary_triangle_gm_gurobi DD_ILP ${GUROBI_LIBRARIES})
+endif()

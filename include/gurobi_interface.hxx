@@ -7,16 +7,19 @@ namespace DD_ILP {
 
 class gurobi_interface {
 public:
+  gurobi_interface()
+    : model_(env_)
+  {}
   using variable = GRBVar;
 
-  struct gurobi_variable_strided_iterator {
-    GRBVar_vector_iterator_strided(GRBVar* it, const std::size_t stride) : _it(it), stride_(stride) {}
-    bool operator==(const GRBVar_vector_iterator_strided o) const { return (it_ == o.it_ && stride_ == o.stride_); }
-    bool operator!=(const GRBVar_vector_iterator_strided o) const { return !(*this == o); }
+  struct gurobi_variable_vector_iterator_strided {
+    gurobi_variable_vector_iterator_strided(GRBVar* it, const std::size_t stride) : it_(it), stride_(stride) {}
+    bool operator==(const gurobi_variable_vector_iterator_strided o) const { return (it_ == o.it_ && stride_ == o.stride_); }
+    bool operator!=(const gurobi_variable_vector_iterator_strided o) const { return !(*this == o); }
     void operator++() { it_+=stride_; }
     const GRBVar operator*() const { return *it_; }
-    int operator-(GRBVar_vector_iterator_strided o) const { return (it_ - o.it_)/stride; }
-    gurobi_vector_iterator_strided operator+(const int n) const { return gurobi_vector_iterator_strided(l + n*stride, stride); } 
+    int operator-(gurobi_variable_vector_iterator_strided o) const { return (it_ - o.it_)/stride_; }
+    gurobi_variable_vector_iterator_strided operator+(const int n) const { return gurobi_variable_vector_iterator_strided(it_ + n*stride_, stride_); } 
     private:
     GRBVar* it_;
     std::size_t stride_;
@@ -27,15 +30,14 @@ public:
     {
       assert(dim > 0);
     } 
-    gurobi_variable_vector(GRBVar* v, const std::size_t dim) : begin_(f), dim_(dim) 
+    gurobi_variable_vector(GRBVar* v, const std::size_t dim) : begin_(v), dim_(dim) 
     {
       assert(dim > 0);
-      assert(f > 0);
     } 
-    void set_begin(GRBVar* l)
+    void set_begin(GRBVar* v)
     {
-      assert(l > 0);
-      begin_ = l;
+      assert(v > 0);
+      begin_ = v;
     }
     bool operator==(const gurobi_variable_vector o) const
     {
@@ -79,7 +81,7 @@ public:
       return gurobi_variable_vector_iterator_strided(begin_ + stride_*size(), stride_);
     }
     private:
-    GRBVar begin_;
+    GRBVar* begin_;
     const std::size_t dim_;
     const std::size_t stride_;
   }; 
@@ -92,7 +94,7 @@ public:
    gurobi_variable_matrix(GRBVar* begin, const std::size_t n, const std::size_t m) : begin_(begin), dim_({n,m}) 
    {
       assert(n > 0 && m > 0);
-      assert(f > 0);
+      assert(begin > 0);
    } 
    void set_begin(GRBVar* begin)
    {
@@ -112,13 +114,13 @@ public:
    {
       assert(begin_ > 0);
       assert(i < size());
-      return begin_ + i;
+      return *(begin_ + i);
    }
    const GRBVar& operator()(const std::size_t x1, const std::size_t x2) const 
    { 
       assert(begin_ > 0);
       assert(x1 < dim(0) && x2 < dim(1));
-      return begin_ + x1*dim(1) + x2;
+      return *(begin_ + x1*dim(1) + x2);
    }
 
    auto begin() const {
@@ -178,10 +180,10 @@ public:
     }
 
     auto begin() const {
-      return gurobi_variable_vector_iterator(begin_);
+      return begin_;
     }
     auto end() const {
-      return gurobi_variable_vector_iterator(begin_ + size());
+      return begin_ + size();
     }
 
     gurobi_variable_vector slice12(const std::size_t x1, const std::size_t x2) const
@@ -212,7 +214,7 @@ public:
 
   GRBVar add_variable()
   {
-    return model_.addVar(GRB_BINARY);
+    return model_.addVar(0.0,1.0,0.0,GRB_BINARY);
   }
 
   gurobi_variable_vector add_vector(const std::size_t dim)
@@ -220,11 +222,23 @@ public:
     GRBVar* vars = model_.addVars(dim, GRB_BINARY);
     return gurobi_variable_vector(vars, dim);
   }
+  gurobi_variable_matrix add_matrix(const std::size_t n, const std::size_t m)
+  {
+    GRBVar* vars = model_.addVars(n*m, GRB_BINARY);
+    return gurobi_variable_matrix(vars, n, m);
+  }
+  gurobi_variable_tensor add_tensor(const std::size_t n, const std::size_t m, const std::size_t l)
+  {
+    GRBVar* vars = model_.addVars(n*m*l, GRB_BINARY);
+    return gurobi_variable_tensor(vars, n, m, l);
+  }
 
   template<typename T>
-  void add_objective(GRBVar x, const T val)
+  void add_objective(const GRBVar& x, const T val)
   {
-    objective_.addTerm(double(val), x);
+    // possibly remove previous instance of term?
+    const double _val(val);
+    objective_.addTerms(&_val, &x, 1);
   }
   //////////////////////////////////////
   // functions for adding constraints //
@@ -234,12 +248,27 @@ public:
    {
      model_.addConstr(i <= j);
    }
+   template<typename ITERATOR>
+   GRBVar max(ITERATOR begin, ITERATOR end)
+   {
+     auto max_var = model_.addVar(0.0, 1.0, 0.0, GRB_BINARY);
+     for(auto it=begin; it!=end; ++it) {
+       add_implication(*it, max_var);
+     }
+     GRBLinExpr sum;
+     for(auto it=begin; it!=end; ++it) {
+       sum += *it;
+     }
+     model_.addConstr(sum >= max_var);
+
+     return max_var; 
+   }
 
    template<typename ITERATOR>
    GRBVar add_at_most_one_constraint(ITERATOR variable_begin, ITERATOR variable_end)
    {
      GRBLinExpr sum_expr = 0;
-     auto sum = model_.addVar(GRB_BINARY);
+     auto sum = model_.addVar(0.0, 1.0, 0.0, GRB_BINARY);
      for(auto it=variable_begin; it!=variable_end; ++it) {
        sum_expr += *it;
      }
@@ -255,12 +284,12 @@ public:
      for(auto it=variable_begin; it!=variable_end; ++it) {
        sum_expr += *it;
      }
-     model_.addConstr(sum_expr = 1);
+     model_.addConstr(sum_expr == 1);
   }
 
-   void make_equal(const GBVar& i, const GRBVar& j)
+   void make_equal(const GRBVar& i, const GRBVar& j)
    {
-     model.addConstr(i == j);
+     model_.addConstr(i == j);
    }
 
    ////////////////////////
@@ -274,10 +303,17 @@ public:
      model_.optimize();
    }
 
-   bool solution(const GRBVar& var) 
+   bool solution(const GRBVar& var) const
    {
      assert(var.get(GRB_DoubleAttr_X) < 0.01 || var.get(GRB_DoubleAttr_X) > -0.01 || var.get(GRB_DoubleAttr_X) > 0.99 || var.get(GRB_DoubleAttr_X) < 1.01);
      var.get(GRB_DoubleAttr_X) > 0.99;
+   }
+
+   void write_to_file(const std::string& filename)
+   {
+     model_.update();
+     model_.setObjective(objective_, GRB_MINIMIZE);
+     model_.write(filename);
    }
 
 private:
