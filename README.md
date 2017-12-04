@@ -10,6 +10,7 @@ This project was originally developed for the [LP_MP](https://github.com/pawelsw
 ## Backends
 Current backends are
 * Lingeling sat solver.
+* gurobi ILP solver.
 * export to text file (no optimization)
 
 ## Installation

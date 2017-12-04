@@ -86,32 +86,32 @@ public:
     return first_active(v.begin(), v.end());
   }
 
-  std::tuple<std::size_t,std::size_t> first_active(const matrix& m) const
+  std::array<std::size_t,2> first_active(const matrix& m) const
   {
      for(std::size_t i=0; i<m.dim1(); ++i) {
         for(std::size_t j=0; j<m.dim2(); ++j) {
            if(static_cast<BASE_SOLVER*>(this)->solution(m(i,j)) == true) {
-              return std::make_tuple(i,j);
+              return std::array<std::size_t,2>({i,j});
            }
         }
      }
      assert(false);
-     return std::make_tuple(std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max());
+     return std::array<std::size_t,2>({std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max()});
   }
 
-  std::tuple<std::size_t,std::size_t,std::size_t> first_active(const tensor& t) const
+  std::array<std::size_t,3> first_active(const tensor& t) const
   {
      for(std::size_t i=0; i<t.dim1(); ++i) {
         for(std::size_t j=0; j<t.dim2(); ++j) {
            for(std::size_t h=0; h<t.dim3(); ++h) {
               if(static_cast<BASE_SOLVER*>(this)->solution(t(i,j,h)) == true) {
-                 return std::make_tuple(i,j,h);
+                 return std::array<std::size_t,3>({i,j,h});
               }
            }
         }
      }
      assert(false);
-     return std::make_tuple(std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max());
+     return std::array<std::size_t,3>({std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max()});
   }
 
   // mechanism to obtain variables: In constraint construction variables are added and can afterwards be retrieved via the corresponding load_...-functions.

@@ -301,12 +301,13 @@ public:
      model_.update();
      model_.setObjective(objective_, GRB_MINIMIZE);
      model_.optimize();
+     return model_.get(GRB_IntAttr_Status) == GRB_OPTIMAL;
    }
 
    bool solution(const GRBVar& var) const
    {
      assert(var.get(GRB_DoubleAttr_X) < 0.01 || var.get(GRB_DoubleAttr_X) > -0.01 || var.get(GRB_DoubleAttr_X) > 0.99 || var.get(GRB_DoubleAttr_X) < 1.01);
-     var.get(GRB_DoubleAttr_X) > 0.99;
+     return var.get(GRB_DoubleAttr_X) > 0.99;
    }
 
    void write_to_file(const std::string& filename)
