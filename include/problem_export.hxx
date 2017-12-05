@@ -297,6 +297,9 @@ struct tensor {
   bool solve() const
   { return false; }
 
+  bool solution(const variable i) const
+  { assert(false); return false; }
+
   void write_to_file(const std::string& filename) const
   {
     std::ofstream f(filename);
