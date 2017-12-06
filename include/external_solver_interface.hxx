@@ -90,7 +90,7 @@ public:
   {
      for(std::size_t i=0; i<m.dim1(); ++i) {
         for(std::size_t j=0; j<m.dim2(); ++j) {
-           if(static_cast<BASE_SOLVER*>(this)->solution(m(i,j)) == true) {
+           if(static_cast<const BASE_SOLVER*>(this)->solution(m(i,j)) == true) {
               return std::array<std::size_t,2>({i,j});
            }
         }
@@ -104,7 +104,7 @@ public:
      for(std::size_t i=0; i<t.dim1(); ++i) {
         for(std::size_t j=0; j<t.dim2(); ++j) {
            for(std::size_t h=0; h<t.dim3(); ++h) {
-              if(static_cast<BASE_SOLVER*>(this)->solution(t(i,j,h)) == true) {
+              if(static_cast<const BASE_SOLVER*>(this)->solution(t(i,j,h)) == true) {
                  return std::array<std::size_t,3>({i,j,h});
               }
            }
