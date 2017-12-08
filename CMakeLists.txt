@@ -32,7 +32,7 @@ option(WITH_GUROBI OFF)
 if(WITH_GUROBI)
   find_package(GUROBI REQUIRED)
   target_include_directories(DD_ILP INTERFACE "${GUROBI_INCLUDE_DIR}")
-  add_definitions(-DDD_ILP_WITH_GUROBI)
+  target_add_definitions(DD_ILP INTERFACE DD_ILP_WITH_GUROBI=1)
 endif()
 
 add_subdirectory(test) 
