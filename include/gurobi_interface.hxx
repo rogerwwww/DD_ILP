@@ -238,6 +238,7 @@ public:
   {
     // possibly remove previous instance of term?
     const double _val(val);
+    objective_.remove(x);
     objective_.addTerms(&_val, &x, 1);
   }
   //////////////////////////////////////
