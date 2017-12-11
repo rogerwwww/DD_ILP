@@ -31,6 +31,7 @@ target_include_directories(DD_ILP INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/externa
 option(WITH_GUROBI OFF)
 if(WITH_GUROBI)
   find_package(GUROBI REQUIRED)
+  target_link_libraries(DD_ILP INTERFACE GUROBI)
   target_include_directories(DD_ILP INTERFACE "${GUROBI_INCLUDE_DIR}")
   target_compile_definitions(DD_ILP INTERFACE DD_ILP_WITH_GUROBI=1)
 endif()
