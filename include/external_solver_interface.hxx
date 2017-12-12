@@ -69,6 +69,18 @@ public:
 
   // helper functions for converting solutions
   template<typename ITERATOR>
+  std::size_t no_active(ITERATOR begin, ITERATOR end) const
+  {
+    std::size_t i=0;
+    for(auto it=begin; it!=end; ++it) {
+        if(static_cast<const BASE_SOLVER*>(this)->solution(*it) == true) {
+          i++;
+        }
+     }
+     return i; 
+  }
+
+  template<typename ITERATOR>
   std::size_t first_active(ITERATOR begin, ITERATOR end) const
   {
     std::size_t i=0;
