@@ -1,8 +1,13 @@
 set(GUROBI_ROOT_DIR "" CACHE PATH "GUROBI root directory.")
 
+set(GUROBI_LIBRARY_POSSIBLE_NAMES libgurobi.so)
+foreach(i RANGE 9 0 -1)
+  list(APPEND GUROBI_LIBRARY_POSSIBLE_NAMES libgurobi7${i}.so)
+endforeach(i)
+
 MESSAGE(STATUS ${GUROBI_VERSION})
 find_path(GUROBI_INCLUDE_DIR gurobi_c++.h HINTS "${GUROBI_ROOT_DIR}/include")
-find_library(GUROBI_LIBRARY libgurobi70.so HINTS ${GUROBI_ROOT_DIR}/lib)
+find_library(GUROBI_LIBRARY NAMES ${GUROBI_LIBRARY_POSSIBLE_NAMES} HINTS ${GUROBI_ROOT_DIR}/lib)
 find_library(GUROBI_CPP_LIBRARY libgurobi_g++5.2.a HINTS ${GUROBI_ROOT_DIR}/lib)
 
 include(FindPackageHandleStandardArgs)
