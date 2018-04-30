@@ -41,3 +41,17 @@ if(WITH_GUROBI)
 endif()
 
 add_subdirectory(test) 
+
+option(BUILD_DOC "Build documentation" OFF)
+if(BUILD_DOC)
+  find_package(Doxygen REQUIRED)
+  configure_file(Doxyfile.in Doxyfile @ONLY)
+  add_custom_target(docs-ddilp
+    COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
+    COMMENT "Generating API documentation with Doxygen"
+    VERBATIM)
+  if(NOT TARGET docs)
+    add_custom_target(docs ALL)
+  endif()
+  add_dependencies(docs docs-ddilp)
+endif()
