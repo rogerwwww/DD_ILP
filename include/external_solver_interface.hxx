@@ -185,7 +185,7 @@ public:
   void add_variable_objective(const T val)
   {
     auto var = load_variable();
-    add_objective(val, val);
+    add_objective(var, val);
   }
   template<typename VECTOR>
   void add_vector_objective(const VECTOR& vals)
