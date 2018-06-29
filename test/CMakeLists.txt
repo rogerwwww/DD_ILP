@@ -1,10 +1,13 @@
 add_executable(binary_triangle_gm_sat binary_triangle_gm_sat.cpp)
-target_link_libraries(binary_triangle_gm_sat DD_ILP)
+target_link_libraries(binary_triangle_gm_sat DD_ILP lingeling lgl lglib)
+add_test(binary_triangle_gm_sat binary_triangle_gm_sat)
 
 add_executable(binary_triangle_gm_problem_export binary_triangle_gm_problem_export.cpp)
 target_link_libraries(binary_triangle_gm_problem_export DD_ILP)
+add_test(binary_triangle_gm_problem_export binary_triangle_gm_problem_export)
 
 if(WITH_GUROBI)
   add_executable(binary_triangle_gm_gurobi binary_triangle_gm_gurobi.cpp)
   target_link_libraries(binary_triangle_gm_gurobi DD_ILP GUROBI )
+  add_test(binary_triangle_gm_gurobi binary_triangle_gm_gurobi)
 endif()

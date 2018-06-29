@@ -25,6 +25,7 @@ if(WITH_GUROBI)
   target_compile_definitions(DD_ILP INTERFACE DD_ILP_WITH_GUROBI=1)
 endif()
 
+enable_testing()
 add_subdirectory(test) 
 
 option(BUILD_DOC "Build documentation" OFF)
