@@ -7,6 +7,7 @@
 #include <tuple>
 #include <utility>
 #include <cassert>
+#include <array>
 
 namespace DD_ILP {
 
